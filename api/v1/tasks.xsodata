@@ -1,0 +1,72 @@
+/*---------------------------------------------------------------------
+    Copyright © 2019 Rizing LLC
+    Version: 1.0
+    Date: 5/22/20
+    Author: Hardwick
+----------------------------------------------------------------------*/
+service {
+
+"CARBON_V1"."C_TASKS" as "tasks" key ("TASK_NAME") 
+    navigates(
+    "taskVariants" as "variants", 
+    "taskProperties" as "properties",
+    "taskParameters" as "parameters",
+    "taskExecutions" as "executions",
+    "taskMessages" as "messages",
+    "taskStatus" as "status"
+);
+
+"CARBON_V1"."C_TASK_VARIANTS" as "variants" navigates("variantValues" as "values");
+"CARBON_V1"."C_TASK_VARIANT_VALUES" as "values";
+"CARBON_V1"."C_TASK_PROPERTIES" as "properties";
+"CARBON_V1"."C_PARAMETERS" as "parameters" key ("TASK_NAME");
+"CARBON_V1"."C_TASK_EXECUTIONS" as "executions" key ("TASK_NAME", "TASK_EXECUTION_ID");
+"CARBON_V1"."C_TASK_MESSAGES" as "messages" key ("TASK_NAME", "OID");
+"CARBON_V1"."C_TASK_STATUS" as "status" key ("TASK_NAME");
+
+association "taskVariants" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "variants"("TASK_NAME")
+multiplicity "*";
+
+association "variantValues" with referential constraint
+principal "variants"("TASK_NAME", "VARIANT_NAME")
+multiplicity "1"
+dependent "values"("TASK_NAME", "VARIANT_NAME")
+multiplicity "*";
+
+association "taskProperties" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "properties"("TASK_NAME")
+multiplicity "*";
+
+association "taskParameters" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "parameters"("TASK_NAME")
+multiplicity "*";
+
+association "taskExecutions" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "executions"("TASK_NAME")
+multiplicity "*";
+
+association "taskMessages" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "messages"("TASK_NAME")
+multiplicity "*";
+
+association "taskStatus" with referential constraint
+principal "tasks"("TASK_NAME")
+multiplicity "1"
+dependent "status"("TASK_NAME")
+multiplicity "*";
+
+}
+annotations {
+	enable OData4SAP;
+}

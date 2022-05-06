@@ -1,0 +1,32 @@
+//  Copyright © 2019 Rizing LLC
+//  Version: 1.0
+//  Date: 5/22/2020
+//  Author: Hardwick
+
+table.schemaName = "CARBON_V1";
+table.tableType = ROWSTORE;
+table.columns = [
+    {name = "TASK_NAME"; sqlType = NVARCHAR; length = 256;},
+    {name = "TOKEN"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD1"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE1"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD2"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE2"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD3"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE3"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD4"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE4"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD5"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE5"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD6"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE6"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD7"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE7"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD8"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE8"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD9"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE9"; sqlType = NVARCHAR; length = 256;},
+    {name = "FIELD10"; sqlType = NVARCHAR; length = 256;},
+    {name = "VALUE10"; sqlType = NVARCHAR; length = 256;}
+];
+table.primaryKey.pkcolumns = ["TASK_NAME"];

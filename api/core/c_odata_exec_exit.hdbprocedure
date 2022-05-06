@@ -1,0 +1,105 @@
+procedure "CARBON_V1"."carbon_v1.api.core::c_odata_exec_exit"
+/*---------------------------------------------------------------------
+    Copyright © 2019 Rizing LLC
+    Version: 1.0
+    Date: 5/22/2020
+    Author: Hardwick
+----------------------------------------------------------------------*/
+(
+    in new "carbon_v1.api.core::c_odata_exec", 
+    out error "carbon_v1.api.core::c_odata_error"
+) 
+    language sqlscript sql security invoker as begin
+    declare j, msg_tab_exists int := 0;
+    declare fld_str, val_str, l_task_name, l_parameter_name nvarchar(256);
+    declare sql_str nvarchar(5000);
+    declare error_str nvarchar(5000);
+    
+    declare exit handler for sqlexception 
+        error = select 400 as http_status_code, 'SQL exception' as error_message, ::SQL_ERROR_CODE || ': ' || ::SQL_ERROR_MESSAGE as detail from dummy;
+
+    -- procedure must be defined in tasks view, ignore everything else
+    -- this service cannot be used to call a proc that is not pre-configured
+    if is_empty(:new) then
+        error = select 400 as http_status_code, 'message body missing' as error_message, 'no data has been passed with the POST request' as detail from dummy;
+        return;
+    end if;
+    
+    if :new.task_name[1] = '' or :new.task_name[1] is null then
+        error = select 400 as http_status_code, 'task_name required' as error_message, 'the task_name field is missing from the message body' as detail from dummy;
+        return;
+    end if;
+    
+    l_task_name = :new.task_name[1];
+    t1 = select * from carbon_v1.c_tasks where task_name = :l_task_name;
+    if is_empty(:t1) then
+        error = select 400 as http_status_code, 'task_name not found' as error_message, 'this service can only process tasks from view c_tasks' as detail from dummy;
+        return;
+    end if;
+
+    -- from here on, we are constructing a SQL statement to call the exit procedure
+    -- with the parameters supplied in the POST
+    
+    -- call syntax used by the odata status service in a search of M_ACTIVE_STATEMENTS
+    sql_str = 'CALL "CARBON_V1"."' || :l_task_name || '"(';
+   
+    -- normalize the parameters supplied in the POST body; hard-wired limit of 10 for easy implementation   
+    all_fields = select map(element_number,1,ucase(field1),2,ucase(field2),3,ucase(field3),4,ucase(field4),5,ucase(field5),6,ucase(field6),7,ucase(field7),8,ucase(field8),9,ucase(field9),10,ucase(field10)) AS field,
+                        map(element_number,1,value1,2,value2,3,value3,4,value4,5,value5,6,value6,7,value7,8,value8,9,value9,10,value10) AS value
+                 from :new,	series_generate_integer(1, 1, 10) order by element_number;
+                 
+    sys_param = select * from carbon_v1.c_parameters where task_name = :l_task_name;
+    
+    for j in 1 .. record_count(:sys_param) do
+        if j > 1 then
+            sql_str = :sql_str || ', ';
+        end if;
+    
+        l_parameter_name = :sys_param.parameter_name[j];
+        if :sys_param.parameter_type[j] = 'OUT' then
+            if :l_parameter_name = 'MESSAGES' then
+                truncate table carbon_v1.c_tmp_msg;
+                msg_tab_exists = 1;
+                sql_str = :sql_str || :l_parameter_name || ' => carbon_v1.c_tmp_msg';
+            else
+                sql_str = :sql_str || :l_parameter_name || ' => ?';
+            end if;
+            continue;
+        end if;
+        
+        begin
+            one_field = select * from :all_fields where field = :l_parameter_name;
+            if is_empty(:one_field) then
+                sql_str = :sql_str || :l_parameter_name || ' => NULL';
+                continue;
+            end if;
+            
+            if :one_field.value[1] is null or :one_field.value[1] = '' then
+                sql_str = :sql_str || :l_parameter_name || ' => NULL';
+            else
+                if  :sys_param.data_type_name[j] = 'BIGINT' or 
+                    :sys_param.data_type_name[j] = 'INTEGER' or 
+                    :sys_param.data_type_name[j] = 'DECIMAL' 
+                then
+                    sql_str = :sql_str || :l_parameter_name || ' => ' || :one_field.value[1];
+                else 
+                    sql_str = :sql_str || :l_parameter_name || ' => ''' || :one_field.value[1] || '''' ;
+                end if;
+            end if;
+        end;
+    end for;
+    
+    -- now the call statement with overview, output to named global temp table    
+    sql_str = :sql_str || ') WITH OVERVIEW;';
+    exec :sql_str;
+    commit work;
+    if :msg_tab_exists = 1 then
+        error_message = select * from carbon_v1.c_tmp_msg where type = 'A';
+        if not is_empty(:error_message) then
+            error_str = :error_message.text[1];
+            error = select 400 as http_status_code, :error_str as error_message, 'a runtime error occurred in the composed procedure' as detail from dummy;
+            return;
+        end if;
+    end if;
+
+end;

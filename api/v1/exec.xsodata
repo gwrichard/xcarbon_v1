@@ -1,0 +1,16 @@
+/*---------------------------------------------------------------------
+    Copyright © 2019 Rizing LLC
+    Version: 1.0
+    Date: 5/22/20
+    Author: Hardwick
+----------------------------------------------------------------------*/
+
+service {
+    "carbon_v1.api.core::c_odata_exec" as "exec"
+    create using "carbon_v1.api.core::c_odata_exec_exit"
+    update forbidden
+    delete forbidden;
+}
+annotations {
+	enable OData4SAP;
+}

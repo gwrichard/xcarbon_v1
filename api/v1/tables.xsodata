@@ -1,0 +1,36 @@
+/*---------------------------------------------------------------------
+    Copyright © 2019 Rizing LLC
+    Version: 1.0
+    Date: 5/22/20
+    Author: Hardwick
+----------------------------------------------------------------------*/
+
+service {
+
+"CARBON_V1"."C_TASK_TABLES" as "tables" key ("TASK_NAME", "TABLE_NAME") 
+    navigates(
+        "tablesP6_RESOURCE_STAGE" as "P6_RESOURCE_STAGE",
+        "tablesP6_ACTIVITY_STAGE" as "P6_ACTIVITY_STAGE",
+        "tablesP6_ACTIVITYCODE_STAGE" as "P6_ACTIVITYCODE_STAGE",
+        "tablesP6_ACTIVITYCODEASSIGN_STAGE" as "P6_ACTIVITYCODEASSIGN_STAGE",
+        "tablesP6_RESOURCEASSIGN_STAGE" as "P6_RESOURCEASSIGN_STAGE",
+        "tablesSAP_OPERATION_STAGE" as "SAP_OPERATION_STAGE"
+);
+
+entity "CARBON_V1"."ODATA_P6_RESOURCE_STAGE" as "P6_RESOURCE_STAGE" key ("TASK_NAME", "TABLE_NAME");
+entity "CARBON_V1"."ODATA_P6_ACTIVITY_STAGE" as "P6_ACTIVITY_STAGE" key ("TASK_NAME", "TABLE_NAME");
+entity "CARBON_V1"."ODATA_P6_ACTIVITYCODE_STAGE" as "P6_ACTIVITYCODE_STAGE" key ("TASK_NAME", "TABLE_NAME");
+entity "CARBON_V1"."ODATA_P6_ACTIVITYCODEASSIGN_STAGE" as "P6_ACTIVITYCODEASSIGN_STAGE" key ("TASK_NAME", "TABLE_NAME");
+entity "CARBON_V1"."ODATA_P6_RESOURCEASSIGN_STAGE" as "P6_RESOURCEASSIGN_STAGE" key ("TASK_NAME", "TABLE_NAME");
+entity "CARBON_V1"."ODATA_SAP_OPERATION_STAGE" as "SAP_OPERATION_STAGE" key ("TASK_NAME", "TABLE_NAME");
+
+association "tablesP6_RESOURCE_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "P6_RESOURCE_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+association "tablesP6_ACTIVITY_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "P6_ACTIVITY_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+association "tablesP6_ACTIVITYCODE_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "P6_ACTIVITYCODE_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+association "tablesP6_ACTIVITYCODEASSIGN_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "P6_ACTIVITYCODEASSIGN_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+association "tablesP6_RESOURCEASSIGN_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "P6_RESOURCEASSIGN_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+association "tablesSAP_OPERATION_STAGE" with referential constraint principal "tables"("TASK_NAME", "TABLE_NAME") multiplicity "1" dependent "SAP_OPERATION_STAGE"("TASK_NAME", "TABLE_NAME") multiplicity "*";
+}
+annotations {
+	enable OData4SAP;
+}

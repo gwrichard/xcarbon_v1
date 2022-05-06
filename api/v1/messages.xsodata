@@ -1,0 +1,13 @@
+/*---------------------------------------------------------------------
+    Copyright © 2020 Rizing LLC
+    Version: 1.0
+    Date: 5/22/20
+    Author: Hardwick
+----------------------------------------------------------------------*/
+service 
+{
+"CARBON_V1"."C_MESSAGE_STREAM" as "stream" key ("OID");
+}
+annotations {
+	enable OData4SAP;
+}
