@@ -11,6 +11,6 @@ service {
     update forbidden
     delete forbidden;
 }
-annotations {
+annotations  {
 	enable OData4SAP;
 }
